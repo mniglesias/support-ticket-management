@@ -1,13 +1,16 @@
 import { HttpInterceptorFn, HttpResponse } from '@angular/common/http';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { delay } from 'rxjs/operators';
 
-import { Comment } from './models/interfaces/comment.interface';
-import { Ticket } from './models/interfaces/ticket.interface';
-import { CreateTicketPayload, UpdateTicketPayload } from './models/interfaces/ticket-api.interface';
-import { TicketPriority } from './models/types/ticket.types';
-import { COMMENTS_MOCK } from './mock/comments.mock';
-import { TICKETS_MOCK } from './mock/tickets.mock';
+import { Comment } from '../../features/tickets/data-access/models/interfaces/comment.interface';
+import { Ticket } from '../../features/tickets/data-access/models/interfaces/ticket.interface';
+import {
+  CreateTicketPayload,
+  UpdateTicketPayload,
+} from '../../features/tickets/data-access/models/interfaces/ticket-api.interface';
+import { TicketPriority } from '../../features/tickets/data-access/models/types/ticket.types';
+import { COMMENTS_MOCK } from '../../features/tickets/data-access/mock/comments.mock';
+import { TICKETS_MOCK } from '../../features/tickets/data-access/mock/tickets.mock';
 
 // Copy of the mocks to mutate them (create/edit) without losing the originals
 let tickets: Ticket[] = [...TICKETS_MOCK];
@@ -28,11 +31,24 @@ export const mockApiInterceptor: HttpInterceptorFn = (req, next) => {
   // GET /api/tickets
   if (url === '/api/tickets' && req.method === 'GET') {
     const search = req.params.get('search')?.toLowerCase() ?? '';
-    const status = req.params.get('status') ?? '';
-    const priority = req.params.get('priority') ?? '';
-    const category = req.params.get('category') ?? '';
-    const assignee = req.params.get('assignee') ?? '';
-    const sort = req.params.get('sort') ?? 'updatedAt';
+    const status = req.params.getAll('status') ?? [];
+    const priority = req.params.getAll('priority') ?? [];
+    const category = req.params.getAll('category') ?? [];
+    const assignee = req.params.getAll('assignee') ?? [];
+    let sort = req.params.get('sort') ?? '';
+    let sortDirection = req.params.get('sortDirection') ?? '';
+
+    if (search === 'errormessage') {
+      return throwError(() => new Error('Error de conexión simulado para testing')).pipe(
+        delay(500),
+      );
+    }
+
+    if (sortDirection === '') {
+      sortDirection = 'desc';
+      sort = 'updatedAt';
+    }
+
     const page = Number(req.params.get('page') ?? 1);
     const pageSize = Number(req.params.get('pageSize') ?? 10);
 
@@ -42,18 +58,22 @@ export const mockApiInterceptor: HttpInterceptorFn = (req, next) => {
         (!search ||
           t.title.toLowerCase().includes(search) ||
           t.description.toLowerCase().includes(search)) &&
-        (!status || t.status === status) &&
-        (!priority || t.priority === priority) &&
-        (!category || t.category === category) &&
-        (!assignee || t.assignee === assignee),
+        (status.length === 0 || status.includes(t.status)) &&
+        (priority.length === 0 || priority.includes(t.priority)) &&
+        (category.length === 0 || category.includes(t.category)) &&
+        (assignee.length === 0 || assignee.includes(t.assignee)),
     );
 
     // Order
-    result.sort((a, b) =>
-      sort === 'priority'
-        ? PRIORITY_WEIGHT[b.priority] - PRIORITY_WEIGHT[a.priority]
-        : new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
-    );
+    result.sort((a, b) => {
+      let cmp = 0;
+      if (sort === 'priority') {
+        cmp = PRIORITY_WEIGHT[a.priority] - PRIORITY_WEIGHT[b.priority];
+      } else {
+        cmp = new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
+      }
+      return sortDirection === 'asc' ? cmp : -cmp;
+    });
 
     // Paging
     const total = result.length;
@@ -108,5 +128,5 @@ export const mockApiInterceptor: HttpInterceptorFn = (req, next) => {
   }
 
   // Return the response with a small delay to simulate network latency
-  return of(new HttpResponse({ status: 200, body: responseBody })).pipe(delay(400));
+  return of(new HttpResponse({ status: 200, body: responseBody })).pipe(delay(500));
 };

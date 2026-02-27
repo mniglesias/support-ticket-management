@@ -6,6 +6,9 @@
 @use '@angular/material' as mat;
 @use 'tailwindcss';
 
+// Material Components Overrides
+@use './styles/material/table';
+
 html {
   color-scheme: light;
 

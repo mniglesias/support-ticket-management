@@ -2,11 +2,12 @@ import { Ticket } from './ticket.interface';
 
 export interface TicketListParams {
   search?: string;
-  status?: string;
-  priority?: string;
-  category?: string;
-  assignee?: string;
+  status?: string | string[];
+  priority?: string | string[];
+  category?: string | string[];
+  assignee?: string | string[];
   sort?: 'updatedAt' | 'priority';
+  sortDirection?: 'asc' | 'desc' | '';
   page?: number;
   pageSize?: number;
 }

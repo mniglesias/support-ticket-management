@@ -57,8 +57,14 @@ export class TicketsService {
   private buildParams(params: TicketListParams): HttpParams {
     let httpParams = new HttpParams();
     Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined && value !== '') {
-        httpParams = httpParams.set(key, String(value));
+      if (value !== undefined && value !== '' && (!Array.isArray(value) || value.length > 0)) {
+        if (Array.isArray(value)) {
+          value.forEach((v) => {
+            httpParams = httpParams.append(key, String(v));
+          });
+        } else {
+          httpParams = httpParams.append(key, String(value));
+        }
       }
     });
     return httpParams;
