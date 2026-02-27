@@ -1,0 +1,23 @@
+@use '@angular/material' as mat;
+
+:root {
+  .snackbar-success {
+    @include mat.snack-bar-overrides(
+      (
+        container-color: rgba(16, 185, 129),
+        supporting-text-color: white,
+        button-color: #ffffff,
+      )
+    );
+  }
+
+  .snackbar-error {
+    @include mat.snack-bar-overrides(
+      (
+        container-color: rgb(245, 101, 101),
+        supporting-text-color: white,
+        button-color: #ffffff,
+      )
+    );
+  }
+}

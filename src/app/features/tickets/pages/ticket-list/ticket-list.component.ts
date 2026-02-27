@@ -1,15 +1,13 @@
-import { Component, inject, signal, computed } from '@angular/core';
-import { toObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { catchError, switchMap, tap, debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { DatePipe } from '@angular/common';
-import { Ticket } from '../../data-access/models/interfaces/ticket.interface';
-import { TicketsService } from '../../data-access/services/tickets.service';
-import { TicketListParams } from '../../data-access/models/interfaces/ticket-api.interface';
+import { RouterModule } from '@angular/router';
+import { TicketListStore } from '../../data-access/services/ticket-list.store';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -33,24 +31,14 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatInputModule,
     MatSelectModule,
     MatTooltipModule,
+    RouterModule,
   ],
   templateUrl: './ticket-list.component.html',
 })
-export class TicketListComponent {
-  private readonly ticketsService = inject(TicketsService);
+export class TicketListComponent implements OnInit {
+  readonly store = inject(TicketListStore);
 
-  tickets = signal<Ticket[]>([]);
-  total = signal(0);
-  loading = signal(true);
-  error = signal<string | null>(null);
   showFilters = signal(false);
-
-  params = signal<TicketListParams>({
-    page: 1,
-    pageSize: 10,
-    sort: 'updatedAt',
-    sortDirection: 'desc',
-  });
 
   displayedColumns: string[] = [
     'id',
@@ -61,12 +49,13 @@ export class TicketListComponent {
     'assignee',
     'createdAt',
     'updatedAt',
+    'actions',
   ];
 
-  skeletonData = computed(() => Array(this.params().pageSize).fill({}));
+  skeletonData = computed(() => Array(this.store.params().pageSize).fill({}));
 
   hasActiveFilters = computed(() => {
-    const params = this.params();
+    const params = this.store.params();
     return (
       !!params.search ||
       (params.status && params.status.length > 0) ||
@@ -92,65 +81,64 @@ export class TicketListComponent {
         takeUntilDestroyed(),
       )
       .subscribe((values) => {
-        this.params.update((p) => ({
-          ...p,
+        this.store.patchParams({
           search: values.search || '',
-          status: values.status || [],
-          priority: values.priority || [],
-          category: values.category || [],
-          assignee: values.assignee || [],
+          status: (values.status as string[]) || [],
+          priority: (values.priority as string[]) || [],
+          category: (values.category as string[]) || [],
+          assignee: (values.assignee as string[]) || [],
           page: 1,
-        }));
+        });
       });
+  }
 
-    toObservable(this.params)
-      .pipe(
-        tap(() => {
-          this.loading.set(true);
-          this.error.set(null);
-        }),
-        switchMap((currentParams) =>
-          this.ticketsService.getTickets(currentParams).pipe(
-            catchError(() => {
-              this.error.set('Error al cargar los tickets');
-              return of({ items: [], total: 0 });
-            }),
-          ),
-        ),
-        takeUntilDestroyed(),
-      )
-      .subscribe((res) => {
-        this.tickets.set(res.items);
-        this.total.set(res.total);
-        this.loading.set(false);
-      });
+  ngOnInit(): void {
+    const currentParams = this.store.params();
+    this.filtersForm.patchValue(
+      {
+        search: currentParams.search || '',
+        status: (currentParams.status as string[]) || [],
+        priority: (currentParams.priority as string[]) || [],
+        category: (currentParams.category as string[]) || [],
+        assignee: (currentParams.assignee as string[]) || [],
+      },
+      { emitEvent: false },
+    );
+
+    if (
+      (currentParams.status && currentParams.status.length > 0) ||
+      (currentParams.priority && currentParams.priority.length > 0) ||
+      (currentParams.category && currentParams.category.length > 0) ||
+      (currentParams.assignee && currentParams.assignee.length > 0)
+    ) {
+      this.showFilters.set(true);
+    }
   }
 
   sortChange(sort: Sort): void {
     const sortBy = sort.active === 'priority' ? 'priority' : 'updatedAt';
-    this.params.update((p) => ({
-      ...p,
+    this.store.patchParams({
       sort: sortBy,
       sortDirection: sort.direction as 'asc' | 'desc' | '',
       page: 1,
-    }));
+    });
   }
 
   handlePageEvent(event: PageEvent): void {
-    this.params.update((p) => ({
-      ...p,
+    this.store.patchParams({
       page: event.pageIndex + 1,
       pageSize: event.pageSize,
-    }));
+    });
   }
 
   // Simulates retry action by clearing the search and resetting the page
   retry(): void {
-    this.error.set(null);
+    this.store.retry();
     this.filtersForm.reset();
   }
 
   clearFilters(): void {
+    this.store.reset();
     this.filtersForm.reset();
   }
 

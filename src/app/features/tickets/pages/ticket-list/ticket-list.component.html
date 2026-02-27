@@ -93,14 +93,14 @@
         mat-table
         matSort
         (matSortChange)="sortChange($event)"
-        [dataSource]="loading() ? skeletonData() : tickets()"
+        [dataSource]="store.loading() ? skeletonData() : store.tickets()"
         class="w-full"
       >
         <!-- Column ID -->
         <ng-container matColumnDef="id">
           <th mat-header-cell *matHeaderCellDef>ID</th>
           <td mat-cell *matCellDef="let ticket">
-            @if (loading()) {
+            @if (store.loading()) {
               <div class="h-4 bg-gray-200 rounded-full animate-pulse w-8"></div>
             } @else {
               {{ ticket.id }}
@@ -112,7 +112,7 @@
         <ng-container matColumnDef="title">
           <th mat-header-cell *matHeaderCellDef>Título</th>
           <td mat-cell *matCellDef="let ticket">
-            @if (loading()) {
+            @if (store.loading()) {
               <div class="h-4 bg-gray-200 rounded-full animate-pulse w-50"></div>
             } @else {
               <span class="font-semibold tracking-wide">{{ ticket.title }}</span>
@@ -124,7 +124,7 @@
         <ng-container matColumnDef="category">
           <th mat-header-cell *matHeaderCellDef>Categoría</th>
           <td mat-cell *matCellDef="let ticket">
-            @if (loading()) {
+            @if (store.loading()) {
               <div class="h-4 bg-gray-200 rounded-full animate-pulse w-16"></div>
             } @else {
               {{ ticket.category }}
@@ -136,7 +136,7 @@
         <ng-container matColumnDef="priority">
           <th mat-header-cell mat-sort-header *matHeaderCellDef>Prioridad</th>
           <td mat-cell *matCellDef="let ticket">
-            @if (loading()) {
+            @if (store.loading()) {
               <div class="h-5 bg-gray-200 rounded-full animate-pulse w-16"></div>
             } @else {
               {{ ticket.priority }}
@@ -148,7 +148,7 @@
         <ng-container matColumnDef="status">
           <th mat-header-cell *matHeaderCellDef>Estado</th>
           <td mat-cell *matCellDef="let ticket">
-            @if (loading()) {
+            @if (store.loading()) {
               <div class="h-5 bg-gray-200 rounded-full animate-pulse w-20"></div>
             } @else {
               {{ ticket.status }}
@@ -160,7 +160,7 @@
         <ng-container matColumnDef="assignee">
           <th mat-header-cell *matHeaderCellDef>Responsable</th>
           <td mat-cell *matCellDef="let ticket">
-            @if (loading()) {
+            @if (store.loading()) {
               <div class="h-4 bg-gray-200 rounded-full animate-pulse w-24"></div>
             } @else {
               {{ ticket.assignee }}
@@ -172,7 +172,7 @@
         <ng-container matColumnDef="createdAt">
           <th mat-header-cell *matHeaderCellDef>Creado</th>
           <td mat-cell *matCellDef="let ticket">
-            @if (loading()) {
+            @if (store.loading()) {
               <div class="h-4 bg-gray-200 rounded-full animate-pulse w-24"></div>
             } @else {
               {{ ticket.createdAt | date: 'dd/MM/yy HH:mm' }}
@@ -184,7 +184,7 @@
         <ng-container matColumnDef="updatedAt">
           <th mat-header-cell mat-sort-header *matHeaderCellDef>Última actualización</th>
           <td mat-cell *matCellDef="let ticket">
-            @if (loading()) {
+            @if (store.loading()) {
               <div class="h-4 bg-gray-200 rounded-full animate-pulse w-24"></div>
             } @else {
               {{ ticket.updatedAt | date: 'dd/MM/yy HH:mm' }}
@@ -192,26 +192,58 @@
           </td>
         </ng-container>
 
+        <!-- Column Acciones -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef class="w-24 text-center">Acciones</th>
+          <td mat-cell *matCellDef="let ticket">
+            @if (store.loading()) {
+              <div class="flex items-center justify-center gap-2">
+                <div class="h-8 w-8 bg-gray-200 rounded-full animate-pulse"></div>
+                <div class="h-8 w-8 bg-gray-200 rounded-full animate-pulse"></div>
+              </div>
+            } @else {
+              <div class="flex items-center justify-center gap-2">
+                <button
+                  mat-icon-button
+                  color="primary"
+                  [routerLink]="['/tickets', ticket.id]"
+                  matTooltip="Ver detalle"
+                >
+                  <mat-icon>visibility</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  color="accent"
+                  [routerLink]="['/ticket', ticket.id, 'edit']"
+                  matTooltip="Editar ticket"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+              </div>
+            }
+          </td>
+        </ng-container>
+
         <tr
           mat-header-row
           *matHeaderRowDef="displayedColumns; sticky: true"
-          [class.hidden]="error() !== null || total() === 0"
+          [class.hidden]="store.error() !== null || store.total() === 0"
         ></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
 
         <!-- Empty / Error state -->
         <tr class="mat-row" *matNoDataRow>
           <td [attr.colspan]="displayedColumns.length">
-            @if (error()) {
+            @if (store.error()) {
               <div class="py-10 flex flex-col items-center justify-center gap-4">
                 <p class="text-lg font-medium bg-red-100 text-red-600 p-3 rounded-full">
-                  {{ error() }}
+                  {{ store.error() }}
                 </p>
                 <button matButton="filled" (click)="retry()">
                   <mat-icon>refresh</mat-icon>Reintentar
                 </button>
               </div>
-            } @else if (total() === 0 && !loading()) {
+            } @else if (store.total() === 0 && !store.loading()) {
               <div class="py-10 flex flex-col items-center justify-center gap-4">
                 <p class="text-lg font-medium text-gray-600 bg-gray-100 p-3 rounded-full">
                   No se encontraron tickets
@@ -223,11 +255,11 @@
       </table>
     </div>
 
-    @if (!error() && total() > 0) {
+    @if (!store.error() && store.total() > 0) {
       <mat-paginator
-        [length]="total()"
-        [pageSize]="params().pageSize"
-        [pageIndex]="(params().page ?? 1) - 1"
+        [length]="store.total()"
+        [pageSize]="store.params().pageSize"
+        [pageIndex]="(store.params().page ?? 1) - 1"
         [pageSizeOptions]="[10, 20]"
         (page)="handlePageEvent($event)"
       ></mat-paginator>
