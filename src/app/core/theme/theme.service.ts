@@ -25,7 +25,6 @@ export class ThemeService {
 
   private getInitialTheme(): Theme {
     const stored = localStorage.getItem('theme') as Theme | null;
-    if (stored) return stored;
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    return stored || 'light';
   }
 }
