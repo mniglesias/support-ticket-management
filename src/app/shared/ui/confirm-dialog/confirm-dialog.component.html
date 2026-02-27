@@ -1,0 +1,12 @@
+<h2 mat-dialog-title>{{ data?.title || 'Atención' }}</h2>
+<mat-dialog-content>
+  <p>
+    {{ data?.message || 'Tenés cambios sin guardar. ¿Estás seguro que querés salir?' }}
+  </p>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button matButton="text" (click)="onCancel()">{{ data?.cancelText || 'Cancelar' }}</button>
+  <button matButton="filled" (click)="onConfirm()">
+    {{ data?.confirmText || 'Salir sin guardar' }}
+  </button>
+</mat-dialog-actions>

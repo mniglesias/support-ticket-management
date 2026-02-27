@@ -1,0 +1,9 @@
+@use '@angular/material' as mat;
+
+@include mat.button-overrides(
+  (
+    filled-container-color: var(--mat-sys-secondary),
+    text-label-text-color: var(--mat-sys-secondary),
+    text-state-layer-color: var(--mat-sys-secondary),
+  )
+);

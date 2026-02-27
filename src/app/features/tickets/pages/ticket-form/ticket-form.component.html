@@ -1,0 +1,128 @@
+<div class="max-w-4xl mx-auto">
+  <div class="flex items-center gap-4 mb-6">
+    <button matIconButton routerLink="/tickets" matTooltip="Volver a la lista">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1 class="text-2xl font-semibold m-0 flex-grow">
+      {{ isEditMode() ? 'Editar Ticket #' + id() : 'Nuevo Ticket' }}
+    </h1>
+  </div>
+
+  <mat-card appearance="raised">
+    <mat-card-content class="p-6 md:p-8">
+      @if (isLoading()) {
+        <div class="flex flex-col gap-6 animate-pulse">
+          <div class="h-10 bg-gray-200 rounded-lg w-3/4"></div>
+          <div class="h-32 bg-gray-200 rounded-lg"></div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="h-14 bg-gray-200 rounded-lg"></div>
+            <div class="h-14 bg-gray-200 rounded-lg"></div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="h-14 bg-gray-200 rounded-lg"></div>
+            <div class="h-14 bg-gray-200 rounded-lg"></div>
+          </div>
+        </div>
+      } @else {
+        <form [formGroup]="ticketForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6">
+          <mat-form-field appearance="outline">
+            <mat-label>Título</mat-label>
+            <input matInput formControlName="title" placeholder="Ej: Error al procesar pago" />
+            @if (ticketForm.get('title')?.hasError('required')) {
+              <mat-error>El título es requerido</mat-error>
+            }
+            @if (ticketForm.get('title')?.hasError('minlength')) {
+              <mat-error>El título debe tener al menos 5 caracteres</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Descripción</mat-label>
+            <textarea
+              matInput
+              formControlName="description"
+              rows="6"
+              placeholder="Describe el problema con detalle..."
+            ></textarea>
+            @if (ticketForm.get('description')?.hasError('required')) {
+              <mat-error>La descripción es requerida</mat-error>
+            }
+            @if (ticketForm.get('description')?.hasError('minlength')) {
+              <mat-error>La descripción debe tener al menos 20 caracteres</mat-error>
+            }
+          </mat-form-field>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <mat-form-field appearance="outline">
+              <mat-label>Categoría</mat-label>
+              <mat-select formControlName="category">
+                <mat-option value="TECH">Technical</mat-option>
+                <mat-option value="BILLING">Billing</mat-option>
+                <mat-option value="OTHER">Other</mat-option>
+              </mat-select>
+              @if (ticketForm.get('category')?.hasError('required')) {
+                <mat-error>La categoría es requerida</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Prioridad</mat-label>
+              <mat-select formControlName="priority">
+                <mat-option value="LOW">Baja</mat-option>
+                <mat-option value="MEDIUM">Media</mat-option>
+                <mat-option value="HIGH">Alta</mat-option>
+              </mat-select>
+              @if (ticketForm.get('priority')?.hasError('required')) {
+                <mat-error>La prioridad es requerida</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Responsable</mat-label>
+              <mat-select formControlName="assignee">
+                <mat-option value="Matias Iglesias">Matias Iglesias</mat-option>
+                <mat-option value="Juan Perez">Juan Perez</mat-option>
+                <mat-option value="Ana Garcia">Ana Garcia</mat-option>
+                <mat-option value="Soporte Técnico">Soporte Técnico</mat-option>
+              </mat-select>
+              @if (ticketForm.get('assignee')?.hasError('required')) {
+                <mat-error>El responsable es requerido</mat-error>
+              }
+            </mat-form-field>
+
+            @if (isEditMode()) {
+              <mat-form-field appearance="outline">
+                <mat-label>Estado</mat-label>
+                <mat-select formControlName="status">
+                  <mat-option value="OPEN">Abierto</mat-option>
+                  <mat-option value="IN_PROGRESS">En Progreso</mat-option>
+                  <mat-option value="DONE">Finalizado</mat-option>
+                </mat-select>
+                @if (ticketForm.get('status')?.hasError('required')) {
+                  <mat-error>El estado es requerido</mat-error>
+                }
+              </mat-form-field>
+            }
+          </div>
+
+          <div class="flex justify-end gap-3 mt-4">
+            <button
+              type="button"
+              matButton="text"
+              routerLink="/tickets"
+              [disabled]="isSubmitting()"
+            >
+              Cancelar
+            </button>
+            <button type="submit" matButton="filled" [disabled]="isSubmitting()">
+              @if (isSubmitting()) {
+                <mat-icon class="animate-spin">sync</mat-icon>
+              }
+              {{ isEditMode() ? 'Guardar cambios' : 'Crear Ticket' }}
+            </button>
+          </div>
+        </form>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,82 +1,57 @@
-# Gestor de Tickets
+# Gestor de Soporte Técnico 🎫
 
-## Cómo correr el proyecto
+Aplicación desarrollada en **Angular 20** diseñada para la gestión eficiente de tickets de soporte, con énfasis en arquitectura escalable, manejo de estado reactivo y excelencia en la experiencia de usuario (UX).
+
+## 🚀 Instalación y Ejecución
 
 ```bash
 npm install
-npm start o ng serve       # dev server en http://localhost:4200
+npm start # o ng serve para iniciar el servidor de desarrollo
 ```
 
-## Decisiones técnicas
+---
 
-### Mock de API
+## 🛠️ Stack Tecnológico y Decisiones Técnicas
 
-Para simular el backend se optó por un interceptor HTTP propio en lugar de JSON Server o Angular In-Memory Web API, ya que no requiere dependencias ni procesos externos y permite implementar la lógica de filtrado, ordenamiento y paginación con total control.
+El proyecto se diseñó siguiendo las mejores prácticas actuales de la industria, optimizando el rendimiento y la mantenibilidad.
 
-**Cómo funciona el interceptor:**
+### Arquitectura y Performance
 
-1. Intercepta requests cuya URL empiece con `/api/`.
-2. Usa expresiones regulares para identificar el endpoint (`/api/tickets`, `/api/tickets/:id`, `/api/tickets/:id/comments`).
-3. Aplica la lógica correspondiente sobre arrays en memoria (copia de los mocks).
-4. Devuelve un `HttpResponse` envuelto en `of(...).pipe(delay(400))` para simular latencia de red.
-5. Cualquier request que no matchee con `/api/` se delega a `next(req)` sin interferencia.
+- **Angular Standalone & Zoneless**: Se prescinde de NgModules para una estructura más limpia. Se implementó `zoneless change detection` junto con **Signals** para un rendering preciso y eficiente.
+- **Estado Global (Store)**: Implementación de un store ligero (`TicketListStore`) basado en Signals para el estado síncrono y RxJS para gestionar efectos asíncronos y flujos de datos.
 
-Los archivos de mock nunca se modifican: al iniciar la app se genera una copia en memoria sobre la que operan las mutaciones (crear, editar).
+### Comunicación de Datos (Mock API)
 
-## Funcionalidades Implementadas
+En lugar de depender de herramientas externas, se implementó un **Interceptor HTTP** propio que intercepta peticiones a `/api/` y simula el comportamiento de un backend real, incluyendo:
 
-### Pantalla: Listado de tickets (`/tickets`)
+- Lógica de búsqueda, filtrado múltiple, ordenamiento y paginación server-side.
+- Simulación de latencia de red.
 
-Se implementó el listado principal de tickets cumpliendo con los siguientes requerimientos:
+---
 
-- **Búsqueda y Filtros Reactivos:**
-  - Búsqueda por texto (título y descripción) con un `debounceTime` de 400ms y `distinctUntilChanged` para evitar llamadas innecesarias a la API.
-  - Filtros de selección múltiple (`mat-select`) para Estado, Prioridad, Categoría y Responsable.
-  - El formulario reactivo emite los cambios y mediante `switchMap` se garantizan la cancelación de requests obsoletos.
-- **Ordenamiento:**
-  - Por defecto, los tickets se ordenan por `updatedAt` de forma descendente.
-  - Se permite alternar el ordenamiento para la columna Prioridad (asignando pesos a HIGH, MEDIUM, LOW en el mock).
-- **Paginación:**
-  - Paginación _Server-Side_ simulada a través del mock interceptor. El componente solo envía los parámetros `page` y `pageSize`, y el servidor devuelve la porción correspondiente junto con el total de registros.
-- **Estados de Interfaz:**
-  - **Loading:** Se diseñó un _Skeleton Loader_ animado con TailwindCSS (`animate-pulse`) cuya cantidad de filas se ajusta dinámicamente al `pageSize` seleccionado.
-  - **Empty State:** Un diseño amigable que se muestra cuando la paginación no devuelve resultados.
-  - **Error State:** Un panel rojo con un ítem de error simulable (buscando por la palabra "errormessage"). Incluye un botón para reintentar el request.
+## ✨ Funcionalidades Destacadas
 
-### Pantalla: Detalle de ticket (`/tickets/:id`)
+### 📋 Listado de Tickets
 
-- **Navegación Intuitiva:**
-  - Al presionar el botón de "Atrás" se utiliza la propiedad `queryParamsHandling="preserve"` de Angular Router, asegurando que los filtros y el paginador de la pantalla anterior se mantengan intactos.
-- **Listado y Carga de Datos:**
-  - Se obtienen y combinan el Ticket principal y sus respectivos Comentarios usando `forkJoin` y `Signals`.
-  - Se diseñó un _Timeline_ de comentarios para mostrar el hilo de interacción y sus fechas exactas.
-- **Acciones Rápidas:**
-  - Desde el panel derecho se puede modificar el "Estado" y la "Prioridad".
-- **Formulario de Comentarios:**
-  - Formulario reactivo al final del hilo (`ReactiveFormsModule`) con validación requerida y cantidad de caracteres mínima (5).
+- **Búsqueda**: Implementación de `debounceTime` y `distinctUntilChanged` para optimizar las peticiones.
+- **Sincronización Inteligente**: Al volver al listado desde cualquier pantalla, se ejecuta un refresco automático garantizando datos actualizados sin duplicar llamadas innecesarias gracias a la validación de parámetros en el Store.
+- **Interfaz Fluida**: Uso de **Skeleton Loaders** para transiciones de carga y manejo de estados vacíos o de error con opción de reintento.
 
-## Componentes Compartidos (Shared)
+### 📝 Detalle de Ticket
 
-- **Sistema de Feedback:**
-  - Implementación de un `SnackbarService` genérico que inyecta componentes personalizados usando Angular Material (`MatSnackBar`).
-  - Provee notificaciones (de éxito en color verde o de error en rojo) con sus respectivos Material Icons al guardar configuraciones o datos, disponible para ser invocado desde cualquier feature de la app.
+- **Timeline de Interacción**: Visualización de comentarios con orden cronológico.
+- **Acciones Rápidas**: Modificación de estado y prioridad con persistencia inmediata.
+- **Formulario de Comentarios**: Validaciones reactivas para garantizar la calidad de la información ingresada.
 
-## Comentarios Generales
+### ➕ Creación y Edición
 
-### UI y Estilos
+- **Formulario Inteligente**: Componente compartido que adapta su lógica según el modo (Crear/Editar) mediante Reactive Forms y validaciones personalizadas.
+- **Protección de Datos (Guards)**: Implementación de `CanDeactivate` vinculado a un **Material Confirm Dialog** propio, evitando la pérdida de cambios accidentales.
+- **Feedback Visual**: Notificaciones dinámicas mediante un `SnackbarService` centralizado.
 
-- Se utiliza **Angular Material** como base de componentes UI para garantizar accesibilidad, consistencia visual y velocidad de desarrollo.
-  Se utiliza principalmente como capa de presentación (table, inputs, paginator, dialogs), mientras que la lógica de filtros, paginación y cancelación de requests se maneja con RxJS para simular un escenario real con backend.
-- Se utiliza **TailwindCSS** para layout y ajustes visuales personalizados.
-  La combinación permite aprovechar la accesibilidad y robustez de Material sin perder flexibilidad en el diseño y la responsividad.
+---
 
-### Arquitectura Angular
-
-- El proyecto está construido con **Standalone Components**, evitando NgModules para simplificar la estructura y alinearse con las prácticas modernas de Angular (v16+).
-- Se utiliza **zoneless change detection** junto con **Signals**, priorizando un modelo de estado más explícito y predecible, reduciendo dependencias implícitas del Zone.js y mejorando el control del rendering.
-- **Store (Signals + RxJS):** Se implementó un store basado en Signals para estado síncrono y RxJS para efectos asíncronos, priorizando cancelación automática de requests con switchMap.
-
-## Estructura de Directorios
+## 📁 Estructura del Proyecto
 
 ```
 src/
@@ -85,22 +60,22 @@ src/
 │
 └── app/
     ├── core/
-    │   ├── interceptors/       ← Interceptores HTTP (manejo centralizado de errores, base URL)
-    │   └── guards/             ← Guards de navegación (CanDeactivate para formularios)
+    │   ├── interceptors/       ← Manejo centralizado de API Mock y errores
+    │   └── guards/             ← Protección de navegación (Confirm Dialog Guard)
     │
     ├── shared/
-    │   ├── models/             ← Interfaces y tipos compartidos (Ej: SnackbarData)
-    │   ├── services/           ← Servicios globales transversales (Ej: SnackbarService)
-    │   ├── ui/                 ← Componentes genéricos reutilizables (Snackbar)
-    │   └── utils/              ← Utilidades y enums transversales (Ej: SnackbarTypeEnum)
+    │   ├── models/             ← Interfaces y tipos compartidos
+    │   ├── services/           ← Servicios transversales (Snackbar, etc.)
+    │   ├── ui/                 ← Componentes UI reutilizables (Confirm Dialog, Snackbar)
+    │   └── utils/              ← Enums y utilidades globales
     │
     └── features/
         └── tickets/
-            ├── data-access/    ← Servicios, modelos/interfaces, mocks
-            │   ├── models/     ← Interfaces (Ticket, Comment, TicketListState)
-            │   ├── services/   ← TicketListStore (Store Signals + RxJS), TicketsService
-            │   └── mocks/      ← Datos mock
-            ├── pages/          ← Componentes de ruta (routed components)
+            ├── data-access/    ← Lógica de datos: Store, Servicios y Mocks
+            │   ├── models/     ← Interfaces específicas del dominio
+            │   ├── services/   ← TicketListStore (Signals + RxJS), TicketsService
+            │   └── mocks/      ← Datos de prueba simulados
+            ├── pages/          ← Componentes de ruta
             │   ├── ticket-list/    → /tickets
             │   ├── ticket-detail/  → /tickets/:id
             │   └── ticket-form/    → /tickets/new y /tickets/:id/edit

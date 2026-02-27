@@ -14,6 +14,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
   selector: 'app-ticket-list',
@@ -32,6 +33,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatSelectModule,
     MatTooltipModule,
     RouterModule,
+    MatCardModule,
   ],
   templateUrl: './ticket-list.component.html',
 })
@@ -113,6 +115,8 @@ export class TicketListComponent implements OnInit {
     ) {
       this.showFilters.set(true);
     }
+
+    this.store.refresh();
   }
 
   sortChange(sort: Sort): void {
@@ -134,12 +138,12 @@ export class TicketListComponent implements OnInit {
   // Simulates retry action by clearing the search and resetting the page
   retry(): void {
     this.store.retry();
-    this.filtersForm.reset();
+    this.filtersForm.reset({}, { emitEvent: false });
   }
 
   clearFilters(): void {
     this.store.reset();
-    this.filtersForm.reset();
+    this.filtersForm.reset({}, { emitEvent: false });
   }
 
   toggleFilters(): void {

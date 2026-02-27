@@ -50,13 +50,19 @@
                     comment.author.charAt(0) | uppercase
                   }}</span>
                 </div>
-                <div class="flex-1 min-w-0 p-4 rounded-xl border border-gray-100">
-                  <div class="flex justify-between items-center mb-2">
-                    <span class="font-medium">{{ comment.author }}</span>
-                    <span class="text-xs">{{ comment.createdAt | date: 'medium' }}</span>
-                  </div>
-                  <p class="whitespace-pre-wrap break-words m-0">{{ comment.message }}</p>
-                </div>
+                <mat-card appearance="outlined" class="flex-grow min-w-0">
+                  <mat-card-content class="p-4">
+                    <div class="flex justify-between items-center mb-2">
+                      <span class="font-medium">{{ comment.author }}</span>
+                      <span class="text-xs text-gray-500">{{
+                        comment.createdAt | date: 'medium'
+                      }}</span>
+                    </div>
+                    <p class="whitespace-pre-wrap break-words m-0 text-gray-500">
+                      {{ comment.message }}
+                    </p>
+                  </mat-card-content>
+                </mat-card>
               </div>
             } @empty {
               <p class="italic text-center py-4 rounded-xl border border-gray-100">

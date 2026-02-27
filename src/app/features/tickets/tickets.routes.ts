@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { unsavedChangesGuard } from '../../core/guards/unsaved-changes.guard';
 
 export const TICKETS_ROUTES: Routes = [
   {
@@ -8,8 +9,9 @@ export const TICKETS_ROUTES: Routes = [
   },
   {
     path: 'new',
+    canDeactivate: [unsavedChangesGuard],
     loadComponent: () =>
-      import('./pages/ticket-new/ticket-new.component').then((m) => m.TicketNewComponent),
+      import('./pages/ticket-form/ticket-form.component').then((m) => m.TicketFormComponent),
   },
   {
     path: ':id',
@@ -18,7 +20,8 @@ export const TICKETS_ROUTES: Routes = [
   },
   {
     path: ':id/edit',
+    canDeactivate: [unsavedChangesGuard],
     loadComponent: () =>
-      import('./pages/ticket-edit/ticket-edit.component').then((m) => m.TicketEditComponent),
+      import('./pages/ticket-form/ticket-form.component').then((m) => m.TicketFormComponent),
   },
 ];

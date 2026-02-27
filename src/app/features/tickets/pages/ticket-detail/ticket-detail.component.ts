@@ -35,6 +35,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatInputModule,
     MatDividerModule,
     MatTooltipModule,
+    MatCardModule,
   ],
   templateUrl: './ticket-detail.component.html',
 })

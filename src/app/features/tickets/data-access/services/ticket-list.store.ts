@@ -66,17 +66,16 @@ export class TicketListStore {
           }));
         }
       });
-
-    this.loadTickets$.next(this.state().params);
   }
 
   patchParams(partialParams: Partial<TicketListParams>): void {
-    let newParams: TicketListParams;
-    this.state.update((state) => {
-      newParams = { ...state.params, ...partialParams };
-      return { ...state, params: newParams };
-    });
-    this.loadTickets$.next(this.state().params);
+    const currentParams = this.state().params;
+    const newParams = { ...currentParams, ...partialParams };
+
+    if (JSON.stringify(currentParams) !== JSON.stringify(newParams)) {
+      this.state.update((state) => ({ ...state, params: newParams }));
+      this.loadTickets$.next(newParams);
+    }
   }
 
   retry(): void {
@@ -87,5 +86,9 @@ export class TicketListStore {
   reset(): void {
     this.state.update((state) => ({ ...state, params: initialState.params }));
     this.loadTickets$.next(initialState.params);
+  }
+
+  refresh(): void {
+    this.loadTickets$.next(this.state().params);
   }
 }
