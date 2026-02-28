@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { catchError, Observable, throwError } from 'rxjs';
+import { environment } from '../../../../../environments/environment';
 
 import { Ticket } from '../models/interfaces/ticket.interface';
 import { Comment } from '../models/interfaces/comment.interface';
@@ -14,7 +15,7 @@ import {
 @Injectable({ providedIn: 'root' })
 export class TicketsService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = '/api/tickets';
+  private readonly baseUrl = `${environment.apiUrl}/tickets`;
 
   getTickets(params: TicketListParams = {}): Observable<TicketListResponse> {
     const httpParams = this.buildParams(params);
