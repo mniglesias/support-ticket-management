@@ -41,6 +41,7 @@ export class TicketFormComponent implements OnInit, HasUnsavedChanges {
   isEditMode = computed(() => !!this.id());
   isSubmitting = signal(false);
   isLoading = signal(false);
+  error = signal<string | null>(null);
 
   readonly ticketForm = this.fb.group({
     title: ['', [Validators.required, Validators.minLength(5)]],
@@ -62,16 +63,7 @@ export class TicketFormComponent implements OnInit, HasUnsavedChanges {
         .pipe(finalize(() => this.isLoading.set(false)))
         .subscribe({
           next: (ticket) => this.ticketForm.patchValue(ticket),
-          error: () => {
-            this.snackbarService.openSnackbar(
-              'No se pudo cargar el ticket',
-              3000,
-              'center',
-              'top',
-              SnackbarTypeEnum.ERROR,
-            );
-            this.router.navigate(['/tickets']);
-          },
+          error: (err) => this.error.set(err?.message ?? null),
         });
     }
   }

@@ -1,5 +1,5 @@
-import { Component, inject, input, OnInit, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, inject, input, OnInit, signal, computed } from '@angular/core';
+import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DatePipe, UpperCasePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
@@ -11,13 +11,14 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TicketsService } from '../../data-access/services/tickets.service';
 import { Ticket } from '../../data-access/models/interfaces/ticket.interface';
 import { Comment } from '../../data-access/models/interfaces/comment.interface';
 import { TicketStatus, TicketPriority } from '../../data-access/models/types/ticket.types';
 import { SnackbarService } from '../../../../shared/services/snackbar.service';
 import { SnackbarTypeEnum } from '../../../../shared/utils/snackbar-type.enum';
-import { MatTooltipModule } from '@angular/material/tooltip';
+import { RelativeTimePipe } from '../../../../shared/pipes/relative-time.pipe';
 
 @Component({
   selector: 'app-ticket-detail',
@@ -35,7 +36,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatInputModule,
     MatDividerModule,
     MatTooltipModule,
-    MatCardModule,
+    RelativeTimePipe,
   ],
   templateUrl: './ticket-detail.component.html',
 })
@@ -51,6 +52,16 @@ export class TicketDetailComponent implements OnInit {
   loading = signal(true);
   error = signal<string | null>(null);
   submittingComment = signal(false);
+  savingStatus = signal(false);
+
+  statusControl = new FormControl<TicketStatus>('OPEN');
+  priorityControl = new FormControl<TicketPriority>('MEDIUM');
+
+  hasChanges = computed(() => {
+    const t = this.ticket();
+    if (!t) return false;
+    return this.statusControl.value !== t.status || this.priorityControl.value !== t.priority;
+  });
 
   commentForm = this.fb.group({
     message: ['', [Validators.required, Validators.minLength(5)]],
@@ -74,36 +85,31 @@ export class TicketDetailComponent implements OnInit {
         next: (res) => {
           this.ticket.set(res.ticket);
           this.comments.set(res.comments);
+          this.statusControl.setValue(res.ticket.status);
+          this.priorityControl.setValue(res.ticket.priority);
         },
-        error: () => this.error.set('Error al cargar el detalle del ticket.'),
+        error: (err) => this.error.set(err?.message ?? 'Error al cargar el detalle del ticket.'),
       });
   }
 
-  updateStatus(status: string) {
-    if (!this.ticket()) return;
-    const currentTicket = this.ticket()!;
-    this.ticketsService
-      .updateTicket(currentTicket.id, { status: status as TicketStatus })
-      .subscribe({
-        next: (updated) => {
-          this.ticket.set(updated);
-          this.showSuccess('Estado actualizado correctamente.');
-        },
-        error: () => this.showError('Error al actualizar el estado.'),
-      });
-  }
+  saveChanges() {
+    if (!this.ticket() || !this.hasChanges() || this.savingStatus()) return;
 
-  updatePriority(priority: string) {
-    if (!this.ticket()) return;
-    const currentTicket = this.ticket()!;
+    this.savingStatus.set(true);
+    const payload = {
+      status: this.statusControl.value as TicketStatus,
+      priority: this.priorityControl.value as TicketPriority,
+    };
+
     this.ticketsService
-      .updateTicket(currentTicket.id, { priority: priority as TicketPriority })
+      .updateTicket(this.ticket()!.id, payload)
+      .pipe(finalize(() => this.savingStatus.set(false)))
       .subscribe({
         next: (updated) => {
           this.ticket.set(updated);
-          this.showSuccess('Prioridad actualizada correctamente.');
+          this.showSuccess('Cambios guardados correctamente.');
         },
-        error: () => this.showError('Error al actualizar la prioridad.'),
+        error: (err) => this.showError(err?.message ?? 'Error al guardar los cambios.'),
       });
   }
 
@@ -122,7 +128,7 @@ export class TicketDetailComponent implements OnInit {
           this.commentForm.reset();
           this.showSuccess('Comentario agregado.');
         },
-        error: () => this.showError('Error al agregar el comentario.'),
+        error: (err) => this.showError(err?.message ?? 'Error al agregar el comentario.'),
       });
   }
 

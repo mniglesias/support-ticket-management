@@ -1,4 +1,4 @@
-import { HttpInterceptorFn, HttpResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpInterceptorFn, HttpResponse } from '@angular/common/http';
 import { of, throwError } from 'rxjs';
 import { delay } from 'rxjs/operators';
 
@@ -94,12 +94,24 @@ export const mockApiInterceptor: HttpInterceptorFn = (req, next) => {
   // GET /api/tickets/:id
   const ticketMatch = url.match(/^\/api\/tickets\/(\d+)$/);
   if (ticketMatch && req.method === 'GET') {
-    responseBody = tickets.find((t) => t.id === Number(ticketMatch[1])) ?? null;
+    const found = tickets.find((t) => t.id === Number(ticketMatch[1]));
+    if (!found) {
+      return throwError(() => new HttpErrorResponse({ status: 404, statusText: 'Not Found' })).pipe(
+        delay(500),
+      );
+    }
+    responseBody = found;
   }
 
   // PUT /api/tickets/:id
   if (ticketMatch && req.method === 'PUT') {
     const id = Number(ticketMatch[1]);
+    const existing = tickets.find((t) => t.id === id);
+    if (!existing) {
+      return throwError(() => new HttpErrorResponse({ status: 404, statusText: 'Not Found' })).pipe(
+        delay(500),
+      );
+    }
     const payload = req.body as UpdateTicketPayload;
     tickets = tickets.map((t) =>
       t.id === id ? { ...t, ...payload, updatedAt: new Date().toISOString() } : t,

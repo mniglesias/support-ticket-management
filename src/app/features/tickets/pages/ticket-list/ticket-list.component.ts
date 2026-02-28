@@ -15,6 +15,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatCardModule } from '@angular/material/card';
+import { Ticket } from '../../data-access/models/interfaces/ticket.interface';
+import { RelativeTimePipe } from '../../../../shared/pipes/relative-time.pipe';
 
 @Component({
   selector: 'app-ticket-list',
@@ -34,6 +36,7 @@ import { MatCardModule } from '@angular/material/card';
     MatTooltipModule,
     RouterModule,
     MatCardModule,
+    RelativeTimePipe,
   ],
   templateUrl: './ticket-list.component.html',
 })
@@ -54,7 +57,7 @@ export class TicketListComponent implements OnInit {
     'actions',
   ];
 
-  skeletonData = computed(() => Array(this.store.params().pageSize).fill({}));
+  skeletonData = computed(() => Array(this.store.params().pageSize).fill({}) as Ticket[]);
 
   hasActiveFilters = computed(() => {
     const params = this.store.params();
