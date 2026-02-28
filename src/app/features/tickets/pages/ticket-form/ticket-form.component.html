@@ -136,7 +136,9 @@
               <button
                 type="submit"
                 matButton="filled"
-                [disabled]="isSubmitting() || (isEditMode() && ticketForm.pristine)"
+                [disabled]="
+                  isSubmitting() || ticketForm.invalid || (isEditMode() && ticketForm.pristine)
+                "
               >
                 @if (isSubmitting()) {
                   <mat-icon class="animate-spin">sync</mat-icon>
