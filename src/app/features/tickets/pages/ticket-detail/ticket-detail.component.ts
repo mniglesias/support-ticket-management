@@ -1,6 +1,6 @@
 import { Component, inject, input, OnInit, signal, computed } from '@angular/core';
-import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { DatePipe, UpperCasePipe } from '@angular/common';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { finalize } from 'rxjs/operators';
@@ -19,6 +19,7 @@ import { TicketStatus, TicketPriority } from '../../data-access/models/types/tic
 import { SnackbarService } from '../../../../shared/services/snackbar.service';
 import { SnackbarTypeEnum } from '../../../../shared/utils/snackbar-type.enum';
 import { RelativeTimePipe } from '../../../../shared/pipes/relative-time.pipe';
+import { TicketCommentsComponent } from './ticket-comments/ticket-comments.component';
 
 @Component({
   selector: 'app-ticket-detail',
@@ -26,7 +27,6 @@ import { RelativeTimePipe } from '../../../../shared/pipes/relative-time.pipe';
   imports: [
     ReactiveFormsModule,
     DatePipe,
-    UpperCasePipe,
     RouterLink,
     MatCardModule,
     MatButtonModule,
@@ -37,6 +37,7 @@ import { RelativeTimePipe } from '../../../../shared/pipes/relative-time.pipe';
     MatDividerModule,
     MatTooltipModule,
     RelativeTimePipe,
+    TicketCommentsComponent,
   ],
   templateUrl: './ticket-detail.component.html',
 })
@@ -45,7 +46,6 @@ export class TicketDetailComponent implements OnInit {
 
   private readonly ticketsService = inject(TicketsService);
   private readonly snackbarService = inject(SnackbarService);
-  private readonly fb = inject(FormBuilder);
 
   ticket = signal<Ticket | null>(null);
   comments = signal<Comment[]>([]);
@@ -61,10 +61,6 @@ export class TicketDetailComponent implements OnInit {
     const t = this.ticket();
     if (!t) return false;
     return this.statusControl.value !== t.status || this.priorityControl.value !== t.priority;
-  });
-
-  commentForm = this.fb.group({
-    message: ['', [Validators.required, Validators.minLength(5)]],
   });
 
   ngOnInit() {
@@ -113,19 +109,16 @@ export class TicketDetailComponent implements OnInit {
       });
   }
 
-  addComment() {
-    if (this.commentForm.invalid || !this.ticket()) return;
+  onCommentSubmit(message: string): void {
+    if (!this.ticket()) return;
 
     this.submittingComment.set(true);
-    const message = this.commentForm.value.message!;
-
     this.ticketsService
       .addComment(this.ticket()!.id, { message, author: 'Soporte Técnico' })
       .pipe(finalize(() => this.submittingComment.set(false)))
       .subscribe({
         next: (newComment) => {
           this.comments.update((c) => [...c, newComment]);
-          this.commentForm.reset();
           this.showSuccess('Comentario agregado.');
         },
         error: (err) => this.showError(err?.message ?? 'Error al agregar el comentario.'),
