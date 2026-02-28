@@ -120,7 +120,7 @@
               {{ ticket.updatedAt | relativeTime }}
             </span>
             <div
-              class="absolute inset-y-0 right-0 flex items-center pr-2 pl-8 opacity-0 group-hover:opacity-100 transition-opacity duration-150"
+              class="absolute inset-y-0 right-0 flex items-center pr-2 pl-12 opacity-0 group-hover:opacity-100 transition-opacity duration-150 bg-gradient-to-l from-[var(--mat-sys-surface-container-high)] from-70% to-transparent"
             >
               <button matIconButton [routerLink]="['/tickets', ticket.id]" matTooltip="Ver detalle">
                 <mat-icon>visibility</mat-icon>

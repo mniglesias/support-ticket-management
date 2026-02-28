@@ -121,6 +121,9 @@ Respuesta del listado:
 { "items": [], "total": 50 }
 ```
 
+> [!IMPORTANT]
+> **Nota sobre Persistencia**: Al utilizar un interceptor con datos en memoria dentro del navegador, cualquier cambio realizado (crear/editar tickets, agregar comentarios) **se perderá al refrescar la página**. El store se reinicia a su estado inicial de prueba en cada carga completa.
+
 ### Paginación Server-Side (simulada)
 
 La paginación se implementa en el interceptor mock usando `slice()` sobre los datos en memoria, simulando correctamente el comportamiento server-side con parámetros `page` y `pageSize`. Esto permite que la lógica del componente y del store sea idéntica a como se comportaría con un backend real.
