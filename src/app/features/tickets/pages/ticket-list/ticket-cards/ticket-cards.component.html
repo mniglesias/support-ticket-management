@@ -10,7 +10,7 @@
   </div>
 } @else if (!loading() && total() === 0) {
   <!-- Empty state -->
-  <div class="py-10 flex flex-col items-center justify-center gap-4">
+  <div data-cy="empty-state" class="py-10 flex flex-col items-center justify-center gap-4">
     <p class="text-lg font-medium text-gray-600 bg-gray-100 p-3 rounded-full">
       No se encontraron tickets
     </p>
@@ -20,7 +20,7 @@
     @if (loading()) {
       <!-- Skeleton -->
       @for (item of skeletonCards(); track $index) {
-        <mat-card appearance="outlined" class="animate-pulse">
+        <mat-card data-cy="loading-skeleton" appearance="outlined" class="animate-pulse">
           <mat-card-content>
             <div class="flex gap-2 mb-2">
               <div class="h-6 w-20 bg-gray-200 rounded-full"></div>
@@ -43,6 +43,7 @@
     } @else {
       @for (ticket of tickets(); track ticket.id) {
         <mat-card
+          data-cy="ticket-card"
           appearance="outlined"
           [routerLink]="['/tickets', ticket.id]"
           class="cursor-pointer hover:scale-102 transition-all"
@@ -51,6 +52,7 @@
             <div class="flex justify-between items-center">
               <div class="flex gap-3">
                 <span
+                  data-cy="ticket-status"
                   class="p-1.5 rounded-full text-xs font-semibold"
                   [ngClass]="statusClasses[ticket.status]"
                 >
@@ -82,7 +84,10 @@
                 </button>
               </div>
             </div>
-            <h3 class="text-base font-semibold leading-snug m-0 line-clamp-2 mt-2">
+            <h3
+              data-cy="ticket-title"
+              class="text-base font-semibold leading-snug m-0 line-clamp-2 mt-2"
+            >
               {{ ticket.title }}
             </h3>
             <p class="text-sm leading-relaxed m-0 line-clamp-3 flex-grow mt-2">

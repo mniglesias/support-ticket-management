@@ -3,7 +3,12 @@
     <div class="flex items-center gap-3 w-full md:w-auto">
       <mat-form-field appearance="outline" subscriptSizing="dynamic" class="flex-grow md:w-72">
         <mat-icon matPrefix>search</mat-icon>
-        <input matInput formControlName="search" placeholder="Buscar título o desc..." />
+        <input
+          matInput
+          formControlName="search"
+          placeholder="Buscar título o desc..."
+          data-cy="search-input"
+        />
         @if (filtersForm.get('search')?.value) {
           <button
             matIconButton
@@ -22,6 +27,7 @@
         (click)="toggleFilters()"
         [class.bg-gray-100]="showFilters()"
         class="rounded-full transition-colors"
+        data-cy="filters-toggle"
       >
         <mat-icon>{{ showFilters() ? 'expand_less' : 'tune' }}</mat-icon>
       </button>
@@ -47,7 +53,7 @@
         <div class="flex flex-col md:flex-row flex-wrap items-start md:items-center gap-4">
           <mat-form-field appearance="fill" subscriptSizing="dynamic" class="w-full md:w-48">
             <mat-label>Estado</mat-label>
-            <mat-select formControlName="status" multiple>
+            <mat-select formControlName="status" multiple data-cy="filter-status">
               <mat-option value="OPEN">Open</mat-option>
               <mat-option value="IN_PROGRESS">In Progress</mat-option>
               <mat-option value="DONE">Done</mat-option>

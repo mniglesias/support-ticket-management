@@ -11,6 +11,8 @@ Aplicación desarrollada en **Angular 20** para la gestión de tickets de soport
 ```bash
 npm install
 npm start       # ng serve – servidor de desarrollo
+npm run e2e     # Abre Cypress de forma interactiva
+npm run e2e:run # Ejecuta los tests en modo headless (consola)
 ```
 
 ---
@@ -162,13 +164,22 @@ Todas las páginas se cargan bajo demanda con `loadComponent` / `loadChildren`. 
 | Signals + RxJS store liviano    | NgRx / ComponentStore           | Suficiente para la escala del proyecto, menos boilerplate |
 | Paginación server-side simulada | Client-side real                | Comportamiento idéntico al production desde el componente |
 
+### Tests E2E (`Cypress`)
+
+Se implementó una suite de pruebas de flujo principal que valida:
+
+- **Carga inicial**: Verifica que la aplicación inicie y despliegue los tickets correctamente.
+- **Filtros avanzados**: Valida la apertura del panel, selección de filtros (ej: estado `DONE`) y que los resultados se actualicen dinámicamente.
+- **Limpieza de estado**: Asegura que al quitar filtros la aplicación restaure la lista completa de tickets.
+- **Uso de `data-cy`**: Se utilizan atributos específicos para selectores, garantizando tests robustos y desacoplados del diseño visual.
+
 ---
 
 ### Pendiente / Próximos Pasos
 
 - Tests unitarios.
 - `shareReplay` / caché por query con invalidación al crear/editar.
-- Suite e2e (Playwright) cubriendo el flujo feliz completo.
+- Suite e2e extendida (flujos de creación y edición).
 
 ---
 
