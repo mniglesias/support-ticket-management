@@ -54,7 +54,7 @@
                   class="p-1.5 rounded-full text-xs font-semibold"
                   [ngClass]="statusClasses[ticket.status]"
                 >
-                  {{ statusLabels[ticket.status] }}
+                  {{ ticket.status }}
                 </span>
                 <span
                   class="p-1.5 rounded-full text-xs font-semibold"
@@ -62,7 +62,10 @@
                 >
                   {{ ticket.priority }}
                 </span>
-                <span class="p-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500">
+                <span
+                  class="p-1.5 rounded-full text-xs font-medium"
+                  [ngClass]="categoryClasses[ticket.category]"
+                >
                   {{ ticket.category }}
                 </span>
               </div>

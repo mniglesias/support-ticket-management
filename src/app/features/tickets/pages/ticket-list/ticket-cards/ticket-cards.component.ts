@@ -8,6 +8,11 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { Ticket } from '../../../data-access/models/interfaces/ticket.interface';
 import { RelativeTimePipe } from '../../../../../shared/pipes/relative-time.pipe';
+import {
+  STATUS_CLASSES,
+  PRIORITY_CLASSES,
+  CATEGORY_CLASSES,
+} from '../../../data-access/models/ticket-badge.constants';
 
 @Component({
   selector: 'app-ticket-cards',
@@ -37,21 +42,7 @@ export class TicketCardsComponent {
   readonly retryClicked = output<void>();
   readonly pageChanged = output<PageEvent>();
 
-  readonly statusClasses: Record<string, string> = {
-    OPEN: 'bg-blue-100 text-blue-700',
-    IN_PROGRESS: 'bg-amber-100 text-amber-700',
-    DONE: 'bg-green-100 text-green-700',
-  };
-
-  readonly statusLabels: Record<string, string> = {
-    OPEN: 'Open',
-    IN_PROGRESS: 'In Progress',
-    DONE: 'Done',
-  };
-
-  readonly priorityClasses: Record<string, string> = {
-    LOW: 'bg-slate-100 text-slate-500',
-    MEDIUM: 'bg-orange-100 text-orange-700',
-    HIGH: 'bg-red-100 text-red-700',
-  };
+  readonly statusClasses = STATUS_CLASSES;
+  readonly priorityClasses = PRIORITY_CLASSES;
+  readonly categoryClasses = CATEGORY_CLASSES;
 }

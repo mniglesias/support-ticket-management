@@ -30,14 +30,18 @@
         </td>
       </ng-container>
 
-      <!-- Column Categoría -->
-      <ng-container matColumnDef="category">
-        <th mat-header-cell *matHeaderCellDef>Categoría</th>
+      <!-- Column Estado -->
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Estado</th>
         <td mat-cell *matCellDef="let ticket">
           @if (loading()) {
-            <div class="h-4 bg-gray-200 rounded-full animate-pulse w-16"></div>
+            <div class="h-5 bg-gray-200 rounded-full animate-pulse w-20"></div>
           } @else {
-            {{ ticket.category }}
+            <span
+              class="px-2 py-1 rounded-full text-xs font-semibold"
+              [ngClass]="statusClasses[ticket.status]"
+              >{{ ticket.status }}</span
+            >
           }
         </td>
       </ng-container>
@@ -49,19 +53,27 @@
           @if (loading()) {
             <div class="h-5 bg-gray-200 rounded-full animate-pulse w-16"></div>
           } @else {
-            {{ ticket.priority }}
+            <span
+              class="px-2 py-1 rounded-full text-xs font-semibold"
+              [ngClass]="priorityClasses[ticket.priority]"
+              >{{ ticket.priority }}</span
+            >
           }
         </td>
       </ng-container>
 
-      <!-- Column Estado -->
-      <ng-container matColumnDef="status">
-        <th mat-header-cell *matHeaderCellDef>Estado</th>
+      <!-- Column Categoría -->
+      <ng-container matColumnDef="category">
+        <th mat-header-cell *matHeaderCellDef>Categoría</th>
         <td mat-cell *matCellDef="let ticket">
           @if (loading()) {
-            <div class="h-5 bg-gray-200 rounded-full animate-pulse w-20"></div>
+            <div class="h-4 bg-gray-200 rounded-full animate-pulse w-16"></div>
           } @else {
-            {{ ticket.status }}
+            <span
+              class="px-2 py-1 rounded-full text-xs font-medium"
+              [ngClass]="categoryClasses[ticket.category]"
+              >{{ ticket.category }}</span
+            >
           }
         </td>
       </ng-container>

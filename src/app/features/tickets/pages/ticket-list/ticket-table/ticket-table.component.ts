@@ -1,5 +1,5 @@
 import { Component, input, output } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { DatePipe, NgClass } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule, Sort } from '@angular/material/sort';
@@ -10,12 +10,18 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatCardModule } from '@angular/material/card';
 import { Ticket } from '../../../data-access/models/interfaces/ticket.interface';
 import { RelativeTimePipe } from '../../../../../shared/pipes/relative-time.pipe';
+import {
+  STATUS_CLASSES,
+  PRIORITY_CLASSES,
+  CATEGORY_CLASSES,
+} from '../../../data-access/models/ticket-badge.constants';
 
 @Component({
   selector: 'app-ticket-table',
   standalone: true,
   imports: [
     DatePipe,
+    NgClass,
     RouterModule,
     MatTableModule,
     MatSortModule,
@@ -41,12 +47,16 @@ export class TicketTableComponent {
   readonly pageChanged = output<PageEvent>();
   readonly sortChanged = output<Sort>();
 
+  readonly statusClasses = STATUS_CLASSES;
+  readonly priorityClasses = PRIORITY_CLASSES;
+  readonly categoryClasses = CATEGORY_CLASSES;
+
   readonly displayedColumns: string[] = [
     'id',
     'title',
-    'category',
-    'priority',
     'status',
+    'priority',
+    'category',
     'assignee',
     'createdAt',
     'updatedAt',
