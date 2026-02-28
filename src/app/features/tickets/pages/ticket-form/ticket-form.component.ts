@@ -7,6 +7,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatCardModule } from '@angular/material/card';
+import { Location } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { finalize } from 'rxjs';
 import { TicketsService } from '../../data-access/services/tickets.service';
@@ -35,6 +36,7 @@ export class TicketFormComponent implements OnInit, HasUnsavedChanges {
 
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
+  private readonly location = inject(Location);
   private readonly ticketsService = inject(TicketsService);
   private readonly snackbarService = inject(SnackbarService);
 
@@ -66,6 +68,10 @@ export class TicketFormComponent implements OnInit, HasUnsavedChanges {
           error: (err) => this.error.set(err?.message ?? null),
         });
     }
+  }
+
+  goBack(): void {
+    this.location.back();
   }
 
   hasUnsavedChanges(): boolean {

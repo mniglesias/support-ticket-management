@@ -12,6 +12,15 @@
         Cargando ticket...
       }
     </h1>
+    @if (ticket()) {
+      <button
+        matButton="outlined"
+        [routerLink]="['/tickets', ticket()!.id, 'edit']"
+        matTooltip="Editar ticket"
+      >
+        <mat-icon>edit</mat-icon> Editar
+      </button>
+    }
   </div>
 
   @if (loading()) {

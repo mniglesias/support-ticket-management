@@ -1,0 +1,122 @@
+<!-- Error state -->
+@if (error()) {
+  <div class="py-10 flex flex-col items-center justify-center gap-4">
+    <p class="text-lg font-medium bg-red-100 text-red-600 p-3 rounded-full">
+      {{ error() }}
+    </p>
+    <button matButton="filled" (click)="retryClicked.emit()">
+      <mat-icon>refresh</mat-icon>Reintentar
+    </button>
+  </div>
+} @else if (!loading() && total() === 0) {
+  <!-- Empty state -->
+  <div class="py-10 flex flex-col items-center justify-center gap-4">
+    <p class="text-lg font-medium text-gray-600 bg-gray-100 p-3 rounded-full">
+      No se encontraron tickets
+    </p>
+  </div>
+} @else {
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+    @if (loading()) {
+      <!-- Skeleton -->
+      @for (item of skeletonCards(); track $index) {
+        <mat-card appearance="outlined" class="animate-pulse">
+          <mat-card-content>
+            <div class="flex gap-2 mb-2">
+              <div class="h-6 w-20 bg-gray-200 rounded-full"></div>
+              <div class="h-6 w-14 bg-gray-200 rounded-full"></div>
+              <div class="h-6 w-16 bg-gray-200 rounded-full"></div>
+            </div>
+            <div class="h-5 w-3/4 bg-gray-200 rounded mb-2"></div>
+            <div class="flex flex-col gap-2">
+              <div class="h-4 w-full bg-gray-200 rounded"></div>
+              <div class="h-4 w-5/6 bg-gray-200 rounded"></div>
+              <div class="h-4 w-2/3 bg-gray-200 rounded"></div>
+            </div>
+            <div class="flex justify-between pt-3 border-t border-gray-100">
+              <div class="h-5 w-24 bg-gray-200 rounded-full"></div>
+              <div class="h-4 w-16 bg-gray-200 rounded"></div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+    } @else {
+      @for (ticket of tickets(); track ticket.id) {
+        <mat-card
+          appearance="outlined"
+          [routerLink]="['/tickets', ticket.id]"
+          class="cursor-pointer hover:scale-102 transition-all"
+        >
+          <mat-card-content>
+            <div class="flex justify-between items-center">
+              <div class="flex gap-3">
+                <span
+                  class="p-1.5 rounded-full text-xs font-semibold"
+                  [ngClass]="statusClasses[ticket.status]"
+                >
+                  {{ statusLabels[ticket.status] }}
+                </span>
+                <span
+                  class="p-1.5 rounded-full text-xs font-semibold"
+                  [ngClass]="priorityClasses[ticket.priority]"
+                >
+                  {{ ticket.priority }}
+                </span>
+                <span class="p-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500">
+                  {{ ticket.category }}
+                </span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs text-gray-400 font-mono">#{{ ticket.id }}</span>
+                <button
+                  matIconButton
+                  [routerLink]="['/tickets', ticket.id, 'edit']"
+                  matTooltip="Editar ticket"
+                  (click)="$event.stopPropagation()"
+                  aria-label="Editar ticket"
+                >
+                  <mat-icon class="!text-base">edit</mat-icon>
+                </button>
+              </div>
+            </div>
+            <h3 class="text-base font-semibold leading-snug m-0 line-clamp-2 mt-2">
+              {{ ticket.title }}
+            </h3>
+            <p class="text-sm leading-relaxed m-0 line-clamp-3 flex-grow mt-2">
+              {{ ticket.description }}
+            </p>
+            <div class="flex items-center justify-between pt-3 border-t border-gray-100 mt-2">
+              <div class="flex items-center gap-2">
+                <div
+                  class="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0"
+                >
+                  <span class="text-blue-700 font-bold text-xs">{{
+                    ticket.assignee.charAt(0)
+                  }}</span>
+                </div>
+                <span class="text-xs">{{ ticket.assignee }}</span>
+              </div>
+              <span
+                class="text-xs cursor-default"
+                [matTooltip]="ticket.updatedAt | date: 'dd/MM/yyyy HH:mm'"
+              >
+                {{ ticket.updatedAt | relativeTime }}
+              </span>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+    }
+  </div>
+
+  @if (!error() && total() > 0) {
+    <mat-paginator
+      [length]="total()"
+      [pageSize]="pageSize()"
+      [pageIndex]="page() - 1"
+      [pageSizeOptions]="[10, 20]"
+      (page)="pageChanged.emit($event)"
+      class="rounded-full mt-4"
+    ></mat-paginator>
+  }
+}
