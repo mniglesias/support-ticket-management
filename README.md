@@ -33,7 +33,9 @@ En lugar de depender de herramientas externas, se implementó un **Interceptor H
 
 ### 📋 Listado de Tickets
 
+- **Vista dual**: Alternancia entre vista de **tarjetas (cards)** y **tabla**, manteniendo el estado del modo seleccionado.
 - **Búsqueda**: Implementación de `debounceTime` y `distinctUntilChanged` para optimizar las peticiones.
+- **Filtros avanzados**: Panel expandible con filtros múltiples por Estado, Prioridad, Categoría y Responsable, sincronizados con la URL (deep-linking).
 - **Sincronización Inteligente**: Al volver al listado desde cualquier pantalla, se ejecuta un refresco automático garantizando datos actualizados sin duplicar llamadas innecesarias gracias a la validación de parámetros en el Store.
 - **Interfaz Fluida**: Uso de **Skeleton Loaders** para transiciones de carga y manejo de estados vacíos o de error con opción de reintento.
 
@@ -76,7 +78,10 @@ src/
             │   ├── services/   ← TicketListStore (Signals + RxJS), TicketsService
             │   └── mocks/      ← Datos de prueba simulados
             ├── pages/          ← Componentes de ruta
-            │   ├── ticket-list/    → /tickets
-            │   ├── ticket-detail/  → /tickets/:id
-            │   └── ticket-form/    → /tickets/new y /tickets/:id/edit
+            │   ├── ticket-list/        → /tickets
+            │   │   ├── ticket-filters/ ← Barra de búsqueda y filtros avanzados
+            │   │   ├── ticket-cards/   ← Vista de tarjetas
+            │   │   └── ticket-table/   ← Vista de tabla
+            │   ├── ticket-detail/      → /tickets/:id
+            │   └── ticket-form/        → /tickets/new y /tickets/:id/edit
 ```
