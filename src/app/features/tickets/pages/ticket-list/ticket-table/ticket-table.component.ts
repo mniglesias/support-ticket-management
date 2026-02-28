@@ -60,6 +60,5 @@ export class TicketTableComponent {
     'assignee',
     'createdAt',
     'updatedAt',
-    'actions',
   ];
 }
