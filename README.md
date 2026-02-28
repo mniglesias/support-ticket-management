@@ -2,6 +2,8 @@
 
 Aplicación desarrollada en **Angular 20** para la gestión de tickets de soporte, con énfasis en arquitectura escalable, manejo de estado reactivo y buena experiencia de usuario.
 
+🔗 **Demo en vivo:** [support-ticket-management-swart.vercel.app](https://support-ticket-management-swart.vercel.app/tickets)
+
 ---
 
 ## 🚀 Instalación y Ejecución
@@ -9,7 +11,6 @@ Aplicación desarrollada en **Angular 20** para la gestión de tickets de soport
 ```bash
 npm install
 npm start       # ng serve – servidor de desarrollo
-npm test        # ng test  – suite de tests unitarios
 ```
 
 ---
