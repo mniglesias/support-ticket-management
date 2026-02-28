@@ -53,7 +53,6 @@ export class TicketListStore {
       sortDirection: qp['sortDirection'] ?? initialParams.sortDirection,
       page: qp['page'] ? Number(qp['page']) : initialParams.page,
       pageSize: qp['pageSize'] ? Number(qp['pageSize']) : initialParams.pageSize,
-      // Arrays: Angular's ActivatedRoute gives string or string[] depending on repetitions
       status: this.toArray(qp['status']),
       priority: this.toArray(qp['priority']),
       category: this.toArray(qp['category']),
