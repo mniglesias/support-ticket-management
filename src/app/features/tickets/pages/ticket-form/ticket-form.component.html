@@ -91,9 +91,9 @@
               <mat-form-field appearance="outline">
                 <mat-label>Prioridad</mat-label>
                 <mat-select formControlName="priority">
-                  <mat-option value="LOW">Baja</mat-option>
-                  <mat-option value="MEDIUM">Media</mat-option>
-                  <mat-option value="HIGH">Alta</mat-option>
+                  <mat-option value="LOW">LOW</mat-option>
+                  <mat-option value="MEDIUM">MEDIUM</mat-option>
+                  <mat-option value="HIGH">HIGH</mat-option>
                 </mat-select>
                 @if (ticketForm.get('priority')?.hasError('required')) {
                   <mat-error>La prioridad es requerida</mat-error>
@@ -118,9 +118,9 @@
                 <mat-form-field appearance="outline">
                   <mat-label>Estado</mat-label>
                   <mat-select formControlName="status">
-                    <mat-option value="OPEN">Abierto</mat-option>
-                    <mat-option value="IN_PROGRESS">En Progreso</mat-option>
-                    <mat-option value="DONE">Finalizado</mat-option>
+                    <mat-option value="OPEN">OPEN</mat-option>
+                    <mat-option value="IN_PROGRESS">IN_PROGRESS</mat-option>
+                    <mat-option value="DONE">DONE</mat-option>
                   </mat-select>
                   @if (ticketForm.get('status')?.hasError('required')) {
                     <mat-error>El estado es requerido</mat-error>
@@ -133,7 +133,11 @@
               <button type="button" matButton="text" (click)="goBack()" [disabled]="isSubmitting()">
                 Cancelar
               </button>
-              <button type="submit" matButton="filled" [disabled]="isSubmitting()">
+              <button
+                type="submit"
+                matButton="filled"
+                [disabled]="isSubmitting() || (isEditMode() && ticketForm.pristine)"
+              >
                 @if (isSubmitting()) {
                   <mat-icon class="animate-spin">sync</mat-icon>
                 }

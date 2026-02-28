@@ -1,4 +1,4 @@
-import { Component, inject, input, OnInit, signal, computed } from '@angular/core';
+import { Component, inject, input, OnInit, signal, viewChild } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -19,6 +19,7 @@ import { TicketStatus, TicketPriority } from '../../data-access/models/types/tic
 import { SnackbarService } from '../../../../shared/services/snackbar.service';
 import { SnackbarTypeEnum } from '../../../../shared/utils/snackbar-type.enum';
 import { RelativeTimePipe } from '../../../../shared/pipes/relative-time.pipe';
+import { HasUnsavedChanges } from '../../../../core/guards/unsaved-changes.guard';
 import { TicketCommentsComponent } from './ticket-comments/ticket-comments.component';
 
 @Component({
@@ -41,11 +42,13 @@ import { TicketCommentsComponent } from './ticket-comments/ticket-comments.compo
   ],
   templateUrl: './ticket-detail.component.html',
 })
-export class TicketDetailComponent implements OnInit {
+export class TicketDetailComponent implements OnInit, HasUnsavedChanges {
   readonly id = input.required<string>();
 
   private readonly ticketsService = inject(TicketsService);
   private readonly snackbarService = inject(SnackbarService);
+
+  private readonly commentsRef = viewChild(TicketCommentsComponent);
 
   ticket = signal<Ticket | null>(null);
   comments = signal<Comment[]>([]);
@@ -56,12 +59,6 @@ export class TicketDetailComponent implements OnInit {
 
   statusControl = new FormControl<TicketStatus>('OPEN');
   priorityControl = new FormControl<TicketPriority>('MEDIUM');
-
-  hasChanges = computed(() => {
-    const t = this.ticket();
-    if (!t) return false;
-    return this.statusControl.value !== t.status || this.priorityControl.value !== t.priority;
-  });
 
   ngOnInit() {
     this.loadData();
@@ -88,14 +85,14 @@ export class TicketDetailComponent implements OnInit {
       });
   }
 
-  saveChanges() {
-    if (!this.ticket() || !this.hasChanges() || this.savingStatus()) return;
+  hasUnsavedChanges(): boolean {
+    return this.commentsRef()?.isDirty() ?? false;
+  }
+
+  saveField(payload: Partial<{ status: TicketStatus; priority: TicketPriority }>) {
+    if (!this.ticket() || this.savingStatus()) return;
 
     this.savingStatus.set(true);
-    const payload = {
-      status: this.statusControl.value as TicketStatus,
-      priority: this.priorityControl.value as TicketPriority,
-    };
 
     this.ticketsService
       .updateTicket(this.ticket()!.id, payload)

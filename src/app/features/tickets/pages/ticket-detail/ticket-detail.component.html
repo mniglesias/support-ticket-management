@@ -89,31 +89,27 @@
 
             <mat-form-field appearance="outline" subscriptSizing="dynamic" class="w-full">
               <mat-label>Estado</mat-label>
-              <mat-select [formControl]="statusControl">
-                <mat-option value="OPEN">Open</mat-option>
-                <mat-option value="IN_PROGRESS">In Progress</mat-option>
-                <mat-option value="DONE">Done</mat-option>
+              <mat-select
+                [formControl]="statusControl"
+                (selectionChange)="saveField({ status: $event.value })"
+              >
+                <mat-option value="OPEN">OPEN</mat-option>
+                <mat-option value="IN_PROGRESS">IN_PROGRESS</mat-option>
+                <mat-option value="DONE">DONE</mat-option>
               </mat-select>
             </mat-form-field>
 
             <mat-form-field appearance="outline" subscriptSizing="dynamic" class="w-full">
               <mat-label>Prioridad</mat-label>
-              <mat-select [formControl]="priorityControl">
-                <mat-option value="LOW">Low</mat-option>
-                <mat-option value="MEDIUM">Medium</mat-option>
-                <mat-option value="HIGH">High</mat-option>
+              <mat-select
+                [formControl]="priorityControl"
+                (selectionChange)="saveField({ priority: $event.value })"
+              >
+                <mat-option value="LOW">LOW</mat-option>
+                <mat-option value="MEDIUM">MEDIUM</mat-option>
+                <mat-option value="HIGH">HIGH</mat-option>
               </mat-select>
             </mat-form-field>
-
-            <button
-              matButton="filled"
-              class="w-full"
-              [disabled]="!hasChanges() || savingStatus()"
-              (click)="saveChanges()"
-            >
-              <mat-icon>save</mat-icon>
-              {{ savingStatus() ? 'Guardando...' : 'Guardar cambios' }}
-            </button>
           </mat-card-content>
         </mat-card>
       </div>

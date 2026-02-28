@@ -44,4 +44,9 @@ export class TicketCommentsComponent {
     this.commentSubmit.emit(this.commentForm.value.message!);
     this.commentForm.reset();
   }
+
+  isDirty(): boolean {
+    const value = this.commentForm.get('message')?.value;
+    return !!(value && value.trim().length > 0);
+  }
 }

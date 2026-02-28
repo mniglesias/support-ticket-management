@@ -15,6 +15,7 @@ export const TICKETS_ROUTES: Routes = [
   },
   {
     path: ':id',
+    canDeactivate: [unsavedChangesGuard],
     loadComponent: () =>
       import('./pages/ticket-detail/ticket-detail.component').then((m) => m.TicketDetailComponent),
   },
