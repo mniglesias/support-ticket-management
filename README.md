@@ -6,6 +6,15 @@ Aplicación desarrollada en **Angular 20** para la gestión de tickets de soport
 
 ---
 
+## ⚙️ Requisitos Previos
+
+Para ejecutar este proyecto de Angular 20 (versión 20.3.x) localmente, necesitás tener instalado:
+
+- **Node.js**: versión `20.19.0` o superior.
+- **NPM** (gestor de paquetes que se incluye con Node.js).
+
+---
+
 ## 🚀 Instalación y Ejecución
 
 ```bash
@@ -121,7 +130,6 @@ Respuesta del listado:
 { "items": [], "total": 50 }
 ```
 
-> [!IMPORTANT]
 > **Nota sobre Persistencia**: Al utilizar un interceptor con datos en memoria dentro del navegador, cualquier cambio realizado (crear/editar tickets, agregar comentarios) **se perderá al refrescar la página**. El store se reinicia a su estado inicial de prueba en cada carga completa.
 
 ### Paginación Server-Side (simulada)
