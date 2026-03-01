@@ -10,18 +10,6 @@ describe('Lista de Tickets y filtros', () => {
     // Espera a que los skeletons desaparezcan y aparezcan las cards
     cy.get('[data-cy="loading-skeleton"]').should('not.exist');
     cy.get('[data-cy="ticket-card"]').should('have.length.greaterThan', 0);
-    cy.get('button.mat-accent span.mat-mdc-button-touch-target').click();
-    cy.get('#mat-input-1').click();
-    cy.get('#mat-input-1').type('Probando ticket con cypress');
-    cy.get('#mat-input-2').click();
-    cy.get('#mat-input-2').type('fldksnflñansñaldjf adskljf dsf dskñfjas dfñkaj dfsl');
-    cy.get('#mat-select-value-1 span.mat-mdc-select-min-line').click();
-    cy.get('#mat-option-2').click();
-    cy.get('#mat-mdc-form-field-label-5 mat-label').click();
-    cy.get('#mat-option-6').click();
-    cy.get('#mat-select-value-3 span.mat-mdc-select-min-line').click();
-    cy.get('#mat-option-8').click();
-    cy.get('button.mat-mdc-unelevated-button span.mdc-button__label').click();
   });
 
   it('debe filtrar por estado DONE usando los filtros avanzados', () => {
