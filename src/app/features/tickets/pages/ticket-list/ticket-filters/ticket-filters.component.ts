@@ -102,6 +102,7 @@ export class TicketFiltersComponent implements OnInit {
         },
         { emitEvent: false },
       );
+      this.formValues.set(this.filtersForm.value);
 
       if (
         (init.status?.length ?? 0) > 0 ||
